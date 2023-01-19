@@ -8,7 +8,7 @@ from imutils.video import FileVideoStream
 from multiprocessing import Pool, Lock
 
 CLIPS_DIRECTORY="../dataset_dmd/clips"
-ALLOWED_THREADS = 30
+ALLOWED_THREADS = 5
 lock = Lock()
 
 def parse_json_file(path):
