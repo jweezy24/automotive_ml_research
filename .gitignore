@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 train_model_test.py
+*.xml
 
 # Distribution / packaging
 .Python
