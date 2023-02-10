@@ -1,11 +1,13 @@
 import os
 import torch
+import gc
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import torch.optim as optim
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+root_path = os.environ["DMD_ROOT"]
 
 class NeuralNetwork(nn.Module):
     def __init__(self,of=10):
@@ -31,15 +33,22 @@ class NeuralNetwork(nn.Module):
         return logits
 
 if __name__ == "__main__":
-    from dmd_dataset_parser import *
-    d_training = DMD(amount=100,training=True)
-    d_testing = DMD(amount=100)
+    from dataset_loader import *
+
+    annotations = root_path+"/annotations.txt"
+
+    d_training = DMD(annotations,train=True)
+    d_testing = DMD(annotations,train=False)
+
+    d_tr_loader = DataLoader(d_training,batch_size=2,shuffle=True,num_workers=5)
+    d_te_loader =DataLoader(d_testing,batch_size=2,shuffle=True,num_workers=5)
+    
     model = NeuralNetwork(of=len(d_training.classes)).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-    print(len(d_training.classes))
+
     for epoch in range(5):  # loop over the dataset multiple times
         model.train()
         running_loss = 0.0
@@ -48,8 +57,9 @@ if __name__ == "__main__":
         for i, data in enumerate(d_training):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
+
             print(f"Evaluationg video {i} with {len(inputs)} frames")
-            batch_size = 20
+            batch_size = 10
             j=0
             while batch_size*j < len(inputs):
 
@@ -76,9 +86,16 @@ if __name__ == "__main__":
                 if f%100 == 0:                
                     print(f'[epoch:{epoch + 1}, iter:{i :5d}, frame:{f}] loss: {running_loss/100}')
                     running_loss = 0.0
-                f+=20
+                f+=batch_size
 
                 j+=1
+                gc.collect()
+                torch.cuda.empty_cache()
+                del frame
+            del inputs
+            del labels
+    
+            torch.save(model.state_dict(), "./m1")
     
 
 

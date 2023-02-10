@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import cv2
 import torchvision
-import os
+import random
 
 import matplotlib.pyplot as plt
 
@@ -48,24 +48,25 @@ class DMD(Dataset):
 
         t_index = (3*len(file_list))//4
 
+        file_list = random.shuffle(file_list)
         
         if training:
             if amount == 0:
                 #Extracting all files within the folder.
-                file_list = glob.glob(self.path + "*")[0:t_index]
+                file_list = file_list[0:t_index]
             else:
                 #Grabbing a subset of files
-                file_list = glob.glob(self.path + "*")[0:amount]
+                file_list = file_list[0:amount]
         else:
             if amount == 0:
                 #Extracting all files within the folder.
-                file_list = glob.glob(self.path + "*")[t_index:]
+                file_list = file_list[t_index:]
             else:
                 #Grabbing a subset of files
                 if t_index+amount > len(file_list):
                     raise RuntimeError("The amount of testing files exceeds amount of data available.") 
                 else:
-                    file_list = glob.glob(self.path + "*")[t_index:t_index+amount]
+                    file_list = file_list[t_index:t_index+amount]
         
         #initalizing some variables
         self.data = []
@@ -192,3 +193,8 @@ if __name__ == "__main__":
     
     for ele in d:
         print(ele)
+
+
+# 1. DataLoader(num_workers=8) for videos
+# 2. bottleneck: check other ways of loading one video (torchvision)
+# 3. torchvision video training examples

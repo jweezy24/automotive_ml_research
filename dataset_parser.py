@@ -8,8 +8,10 @@ from imutils.video import FileVideoStream
 from multiprocessing import Pool, Lock
 
 CLIPS_DIRECTORY="../dataset_dmd/clips"
-ALLOWED_THREADS = 5
+ALLOWED_THREADS = 16
 lock = Lock()
+class_num_iter = 0
+vid_num = 0
 
 def parse_json_file(path):
     l = open(path)
@@ -108,8 +110,9 @@ def get_clip_object(match_str,l,st,frame_size):
         lock.release()
         return w
 
-def write_clip(path,st,en,l,match_str,frame_size):
-   
+def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num):
+    label = l.replace("/","-")
+
     fname = CLIPS_DIRECTORY+"/"+match_str+";"+l.replace("/","-")+f";{st}.mp4"
     lock.acquire()
     capture = FileVideoStream(path).start()
@@ -117,12 +120,15 @@ def write_clip(path,st,en,l,match_str,frame_size):
     c = 0
 
 
-
-    clip = get_clip_object(match_str,l,st,frame_size)
-    if clip == None:
-        capture.stop()
-        print(fname)
-        return None
+    print(vid_num)
+    # clip = get_clip_object(match_str,l,st,frame_size)
+    frames_directory = f"../dataset_dmd/clips/{label}/{vid_num}/"
+    if not os.path.exists(frames_directory):
+        os.makedirs(frames_directory)
+    # if clip == None:
+    #     capture.stop()
+    #     print(fname)
+    #     return None
 
     while True:
         if c == st:
@@ -133,9 +139,10 @@ def write_clip(path,st,en,l,match_str,frame_size):
 
                 if good:
                     print(st,en,l,i)
-                    clip.write(frame)
+                    image_name = "img_{:07d}.jpg".format(i)
+                    cv2.imwrite(frames_directory+image_name,frame) 
                 else:
-                    clip.release()
+                    # clip.release()
                     capture.stop()
                     print(st,en,l,i)
                     print("STREAM BAD")
@@ -147,24 +154,25 @@ def write_clip(path,st,en,l,match_str,frame_size):
             frame = capture.read()
             good = type(frame) != type(None)
             if not good:
-                clip.release()
                 capture.stop()
                 print(st,en,l,)
                 print("STREAM BAD")
                 gc.collect()
                 return None
             c+=1
-    
+    print("HERE")
     lock.acquire()
-    clip.release()
     capture.stop()
+    with open(CLIPS_DIRECTORY+"/annotations.txt","a+") as f:
+        f.write(f"{label}/{vid_num} {en-st} {class_num}\n")
+
     lock.release()
     gc.collect()
     return None
 
-def clip_segmenter(path,match_str,segments):
+def clip_segmenter(path,match_str,segments,global_labels):
     
-   
+    class_counters = {}
     pool = Pool(ALLOWED_THREADS)
 
     segments = sorted(segments,key=return_start_frame_number)
@@ -182,8 +190,16 @@ def clip_segmenter(path,match_str,segments):
     c = 0
     for st,en,l in segments:
         # write_clip(path,st,en,l,match_str)
+        label = l
+        if label not in class_counters.keys():
+            class_counters[label] = 1
+            vid_num = 1
+        else:
+            class_counters[label] += 1
+            vid_num = class_counters[label]
+        
         if c < ALLOWED_THREADS:
-            p = pool.apply_async(write_clip, (path,st,en,l,match_str,frame_size,))
+            p = pool.apply_async(write_clip, (path,st,en,l,match_str,frame_size,vid_num,global_labels[l]))
             threads[c] = (p,st,en,l)
             gc.collect()
             c+=1
@@ -209,7 +225,8 @@ def clip_segmenter(path,match_str,segments):
         a+=1
     
 
-def iterate_data(pairs):
+def iterate_data(pairs,global_labels):
+    global class_num_iter
     total_labels = []
     features = {} 
     for key in pairs.keys():
@@ -219,15 +236,21 @@ def iterate_data(pairs):
         
         if check != None:
             metadata,segs,labels_set = check
-            clip_segmenter(vid_path,key,segs)
-            
             for label in labels_set:
-                if label in total_labels:
-                    continue
-                else:
-                    total_labels.append(label)
-            print(total_labels)
+                if label not in global_labels.keys():
+                    global_labels[label] = class_num_iter
+                    class_num_iter+=1
+                
 
+            clip_segmenter(vid_path,key,segs,global_labels)
+            
+            # for label in labels_set:
+            #     if label in total_labels:
+            #         continue
+            #     else:
+            #         total_labels.append(label)
+            # print(total_labels)
+            # exit()
             features[key] = metadata
 
 
@@ -263,5 +286,6 @@ if __name__ == "__main__":
     if not os.path.exists(CLIPS_DIRECTORY):
         os.mkdir(CLIPS_DIRECTORY)
 
+    all_labels = {}
     file_pairs = create_file_pairs("../dataset_dmd")
-    iterate_data(file_pairs)
+    iterate_data(file_pairs,all_labels)
