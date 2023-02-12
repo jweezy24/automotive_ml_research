@@ -3,15 +3,61 @@ import sys
 import json
 import cv2
 import gc
+import sqlite3
+import io
+import numpy as np
 
 from imutils.video import FileVideoStream
 from multiprocessing import Pool, Lock
 
 CLIPS_DIRECTORY="../dataset_dmd/clips"
-ALLOWED_THREADS = 16
+ALLOWED_THREADS = 32
 lock = Lock()
 class_num_iter = 0
 vid_num = 0
+
+db = sqlite3.connect('dmd.db',check_same_thread=False)
+
+cur = db.cursor()
+
+cur.execute('''CREATE TABLE IF NOT EXISTS Data(
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    label TEXT, vid_num INT, frame INT, 
+                    bytes ARRAY, age TEXT, 
+                    gender TEXT, exp TEXT,
+                    freq TEXT
+                    )''')
+
+def adapt_array(arr):
+    """
+    http://stackoverflow.com/a/31312102/190597 (SoulNibbler)
+    """
+    out = io.BytesIO()
+    np.save(out, arr)
+    out.seek(0)
+    return sqlite3.Binary(out.read())
+
+def convert_array(text):
+    import io
+    out = io.BytesIO(text)
+    out.seek(0)
+    return np.load(out)
+
+
+def save_image_to_db(img,metadata,label,frame_num,vid_num):
+    blob = adapt_array(img)
+    age = metadata["age"]
+    gender = metadata["gender"]
+    exp = metadata["exp"]
+    freq = metadata["d_freq"]
+
+    sql = ''' INSERT INTO Data(label,vid_num,frame,bytes,age,gender,exp,freq)
+    VALUES(?,?,?,?,?,?,?,?) '''
+    db.execute(sql, (label,vid_num,frame_num,blob,age,gender,exp,freq))
+    db.commit()
+    
+sqlite3.register_adapter(np.ndarray, adapt_array)
+sqlite3.register_converter("ARRAY", convert_array)
 
 def parse_json_file(path):
     l = open(path)
@@ -110,13 +156,14 @@ def get_clip_object(match_str,l,st,frame_size):
         lock.release()
         return w
 
-def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num):
+def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num,metadata):
     label = l.replace("/","-")
-
+    convert = True
     fname = CLIPS_DIRECTORY+"/"+match_str+";"+l.replace("/","-")+f";{st}.mp4"
-    lock.acquire()
-    capture = FileVideoStream(path).start()
-    lock.release()
+    if not convert:
+        lock.acquire()
+        capture = FileVideoStream(path).start()
+        lock.release()
     c = 0
 
 
@@ -129,48 +176,66 @@ def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num):
     #     capture.stop()
     #     print(fname)
     #     return None
+    if not convert:
+        while True:
+            if c == st:
 
-    while True:
-        if c == st:
+                for i in range(0,en-st):
+                    frame = capture.read()
+                    good = type(frame) != type(None)
 
-            for i in range(0,en-st):
+                    if good:
+                        print(st,en,l,i)
+                        image_name = "img_{:07d}.jpg".format(i)
+                        # print(type(frame))
+                        lock.acquire()
+                        save_image_to_db(frame,metadata,label,i,vid_num)
+                        lock.release()
+                        # cv2.imwrite(frames_directory+image_name,frame) 
+                    else:
+                        # clip.release()
+                        capture.stop()
+                        print(st,en,l,i)
+                        print("STREAM BAD")
+                        gc.collect()
+                        return None
+                    c+=1
+                break
+            elif c < st:
                 frame = capture.read()
                 good = type(frame) != type(None)
-
-                if good:
-                    print(st,en,l,i)
-                    image_name = "img_{:07d}.jpg".format(i)
-                    cv2.imwrite(frames_directory+image_name,frame) 
-                else:
-                    # clip.release()
+                if not good:
                     capture.stop()
-                    print(st,en,l,i)
+                    print(st,en,l,)
                     print("STREAM BAD")
                     gc.collect()
                     return None
                 c+=1
-            break
-        elif c < st:
-            frame = capture.read()
-            good = type(frame) != type(None)
-            if not good:
-                capture.stop()
-                print(st,en,l,)
-                print("STREAM BAD")
-                gc.collect()
-                return None
-            c+=1
+    else:
+        _, _, files = next(os.walk(frames_directory))
+        i = 0
+        for file in files:
+            print(st,en,l,i)
+            img = cv2.imread(frames_directory+"/"+file)
+            lock.acquire()
+            save_image_to_db(img,metadata,label,i,vid_num)
+            lock.release()
+            i+=1
+    
     print("HERE")
+    
     lock.acquire()
-    capture.stop()
+    if not convert:
+        capture.stop()
+    
     with open(CLIPS_DIRECTORY+"/annotations.txt","a+") as f:
         f.write(f"{label}/{vid_num} {en-st} {class_num}\n")
-
     lock.release()
+    
     gc.collect()
     return None
 
-def clip_segmenter(path,match_str,segments,global_labels):
+def clip_segmenter(path,match_str,segments,global_labels,metadata):
     
     class_counters = {}
     pool = Pool(ALLOWED_THREADS)
@@ -199,7 +264,7 @@ def clip_segmenter(path,match_str,segments,global_labels):
             vid_num = class_counters[label]
         
         if c < ALLOWED_THREADS:
-            p = pool.apply_async(write_clip, (path,st,en,l,match_str,frame_size,vid_num,global_labels[l]))
+            p = pool.apply_async(write_clip, (path,st,en,l,match_str,frame_size,vid_num,global_labels[l],metadata,))
             threads[c] = (p,st,en,l)
             gc.collect()
             c+=1
@@ -242,15 +307,8 @@ def iterate_data(pairs,global_labels):
                     class_num_iter+=1
                 
 
-            clip_segmenter(vid_path,key,segs,global_labels)
+            clip_segmenter(vid_path,key,segs,global_labels,metadata)
             
-            # for label in labels_set:
-            #     if label in total_labels:
-            #         continue
-            #     else:
-            #         total_labels.append(label)
-            # print(total_labels)
-            # exit()
             features[key] = metadata
 
 
@@ -286,6 +344,12 @@ if __name__ == "__main__":
     if not os.path.exists(CLIPS_DIRECTORY):
         os.mkdir(CLIPS_DIRECTORY)
 
+    
+    # cur.execute("select * from Data")
+    # data = cur.fetchone()[0]
+
     all_labels = {}
     file_pairs = create_file_pairs("../dataset_dmd")
     iterate_data(file_pairs,all_labels)
+
+    

@@ -5,9 +5,14 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import torch.optim as optim
+import sqlite3
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 root_path = os.environ["DMD_ROOT"]
+
+db = sqlite3.connect('dmd.db',check_same_thread=False)
+cur = db.cursor()
+
 
 class NeuralNetwork(nn.Module):
     def __init__(self,of=10):
@@ -54,10 +59,12 @@ if __name__ == "__main__":
         running_loss = 0.0
 
         f = 0
+        print("TRAINING STARTS NOW")
         for i, data in enumerate(d_training):
+            print(data)
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-
+            print(inputs)
             print(f"Evaluationg video {i} with {len(inputs)} frames")
             batch_size = 10
             j=0
