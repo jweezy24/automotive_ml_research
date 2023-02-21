@@ -9,7 +9,7 @@ from torch.utils.data.dataset import Dataset
 from skimage import io
 from skimage.transform import resize
 
-db = sqlite3.connect('dmd.db',check_same_thread=False)
+db = sqlite3.connect('/home/jweezy/Drive2/Drive2/Datasets/dmd.db',check_same_thread=False)
 cur = db.cursor()
 
 root_path = os.environ["DMD_ROOT"]
@@ -111,15 +111,17 @@ class DMD(Dataset):
             pool = Pool(ALLOWED_THREADS)
             threads = [0 for i in range(ALLOWED_THREADS)]
             path,label,frames = self.data[index]
+            print(path)
             vid_num = path.split("/")[-1]
             res = cur.execute(f"SELECT frame, bytes FROM Data WHERE label= '{label}' AND vid_num= {vid_num};")
-            data = res.fetchall()
+            print("DONE FETCHING")
 
             frames_arr = [0 for i in range(len(data))]
             print("LOADING DATA")
             c = 0
+            data = res.fetchone()
             if data != None and len(data) > 0:
-                for i in data:
+                while data != None:
                     frame,bts = i
                     t = pool.apply_async(prepare_arr,(bts,frame,))
                     threads[c] = t
@@ -129,10 +131,12 @@ class DMD(Dataset):
                         for t in threads:
                             if t != 0:
                                 res = t.get()
+                                print(t)
                                 if res != None:
                                     img,frame = res
                                     frames_arr[frame] = img
                         c=0
+                    data = res.fetchone()
                     # img = convert_array(bts)
                     # img = resize(img,self.frame_size)
                     # print(frame)
@@ -143,6 +147,7 @@ class DMD(Dataset):
                 for t in threads:
                     if t != 0:
                         res = t.get()
+                        print(t)
                         if res != None:
                             img,frame = res
                             frames_arr[frame] = img
