@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     transform = transforms.Compose([transforms.PILToTensor()])
     
-    d_tr_loader = DataLoader(d_training2,batch_size=10,shuffle=True,num_workers=5)
+    d_tr_loader = DataLoader(d_training2,batch_size=2,shuffle=True,num_workers=5)
     # d_te_loader =DataLoader(d_testing,batch_size=10,shuffle=True,num_workers=5)
 
     
