@@ -194,7 +194,6 @@ def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num,metadata):
                         cv2.imwrite(frames_directory+image_name,frame) 
                     
                 else:
-                    # clip.release()
                     capture.stop()
                     print(st,en,l,i)
                     print("STREAM BAD")
