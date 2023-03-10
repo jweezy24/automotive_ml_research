@@ -158,78 +158,68 @@ def get_clip_object(match_str,l,st,frame_size):
 
 def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num,metadata):
     label = l.replace("/","-")
-    convert = True
     fname = CLIPS_DIRECTORY+"/"+match_str+";"+l.replace("/","-")+f";{st}.mp4"
-    if not convert:
-        lock.acquire()
-        capture = FileVideoStream(path).start()
-        lock.release()
+   
+    print(path)
+    lock.acquire()
+    capture = FileVideoStream(path).start()
+    lock.release()
+
     c = 0
 
+    use_db = False
 
     print(vid_num)
-    # clip = get_clip_object(match_str,l,st,frame_size)
+
     frames_directory = f"/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd/clips/{label}/{vid_num}/"
     if not os.path.exists(frames_directory):
         os.makedirs(frames_directory)
-    # if clip == None:
-    #     capture.stop()
-    #     print(fname)
-    #     return None
-    if not convert:
-        while True:
-            if c == st:
 
-                for i in range(0,en-st):
-                    frame = capture.read()
-                    good = type(frame) != type(None)
+    
+    while True:
+        if c == st:
 
-                    if good:
-                        print(st,en,l,i)
-                        image_name = "img_{:07d}.jpg".format(i)
-                        # print(type(frame))
+            for i in range(0,en-st):
+                frame = capture.read()
+                good = type(frame) != type(None)
+
+                if good:
+                    print(st,en,l,i)
+                    image_name = "img_{:07d}.jpg".format(i)
+                    if use_db:
                         lock.acquire()
                         save_image_to_db(frame,metadata,label,i,vid_num)
                         lock.release()
-                        # cv2.imwrite(frames_directory+image_name,frame) 
                     else:
-                        # clip.release()
-                        capture.stop()
-                        print(st,en,l,i)
-                        print("STREAM BAD")
-                        gc.collect()
-                        return None
-                    c+=1
-                break
-            elif c < st:
-                frame = capture.read()
-                good = type(frame) != type(None)
-                if not good:
+                        cv2.imwrite(frames_directory+image_name,frame) 
+                    
+                else:
+                    # clip.release()
                     capture.stop()
-                    print(st,en,l,)
+                    print(st,en,l,i)
                     print("STREAM BAD")
                     gc.collect()
                     return None
                 c+=1
-    else:
-        _, _, files = next(os.walk(frames_directory))
-        i = 0
-        for file in files:
-            print(st,en,l,i)
-            img = cv2.imread(frames_directory+"/"+file)
-            lock.acquire()
-            save_image_to_db(img,metadata,label,i,vid_num)
-            lock.release()
-            i+=1
+            break
+        elif c < st:
+            frame = capture.read()
+            good = type(frame) != type(None)
+            if not good:
+                capture.stop()
+                print(st,en,l,)
+                print("STREAM BAD")
+                gc.collect()
+                return None
+            c+=1
     
-    print("HERE")
+    
     
     lock.acquire()
-    if not convert:
-        capture.stop()
+    capture.stop()
     
     with open(CLIPS_DIRECTORY+"/annotations.txt","a+") as f:
-        f.write(f"{label}/{vid_num} {en-st} {class_num}\n")
+        f.write(f"{label}/{vid_num} {en-st} {class_num} {metadata}\n")
     lock.release()
     
     gc.collect()
@@ -296,6 +286,10 @@ def iterate_data(pairs,global_labels):
     features = {} 
     for key in pairs.keys():
         json_path,vid_path = pairs[key]
+        
+        #If no video was found
+        if vid_path == 0:
+            continue
 
         check = parse_json_file(json_path)
         
@@ -337,16 +331,20 @@ def create_file_pairs(path):
                     tmp = file_pairs[match_string]
                     tmp[0] = root+"/"+f
                     file_pairs[match_string]= tmp
+    
     return file_pairs
 
+
 if __name__ == "__main__":
+    clear_data = True
+
+    if clear_data:
+        import shutil
+        shutil.rmtree(CLIPS_DIRECTORY)
+        
 
     if not os.path.exists(CLIPS_DIRECTORY):
         os.mkdir(CLIPS_DIRECTORY)
-
-    
-    # cur.execute("select * from Data")
-    # data = cur.fetchone()[0]
 
     all_labels = {}
     file_pairs = create_file_pairs("/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd")
