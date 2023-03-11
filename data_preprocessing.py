@@ -3,8 +3,8 @@ import cv2
 from mtcnn import MTCNN
 
 
-dataset_path = '/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd/clips_backup'
-aligned_dir = '/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd/aligned'
+dataset_path = './dataset_dmd/clips'
+aligned_dir = './dataset_dmd/aligned'
 detector = MTCNN()
 
 
