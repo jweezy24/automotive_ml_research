@@ -10,7 +10,7 @@ import numpy as np
 from imutils.video import FileVideoStream
 from multiprocessing import Pool, Lock
 
-CLIPS_DIRECTORY="/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd/clips"
+CLIPS_DIRECTORY="./dataset_dmd/clips"
 ALLOWED_THREADS = 32
 lock = Lock()
 class_num_iter = 0
@@ -171,7 +171,7 @@ def write_clip(path,st,en,l,match_str,frame_size,vid_num,class_num,metadata):
 
     print(vid_num)
 
-    frames_directory = f"/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd/clips/{label}/{vid_num}/"
+    frames_directory = f"./dataset_dmd/clips/{label}/{vid_num}/"
     if not os.path.exists(frames_directory):
         os.makedirs(frames_directory)
 
@@ -338,7 +338,7 @@ def create_file_pairs(path):
 if __name__ == "__main__":
     clear_data = True
 
-    if clear_data:
+    if clear_data and os.path.exists(CLIPS_DIRECTORY):
         import shutil
         shutil.rmtree(CLIPS_DIRECTORY)
         
@@ -347,7 +347,7 @@ if __name__ == "__main__":
         os.mkdir(CLIPS_DIRECTORY)
 
     all_labels = {}
-    file_pairs = create_file_pairs("/home/jweezy/Drive2/Drive2/Datasets/data/dataset_dmd")
+    file_pairs = create_file_pairs("./dataset_dmd")
     iterate_data(file_pairs,all_labels)
 
     

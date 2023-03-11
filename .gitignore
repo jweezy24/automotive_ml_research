@@ -8,6 +8,8 @@ __pycache__/
 train_model_test.py
 *.xml
 
+dataset_dmd/*
+
 # Distribution / packaging
 .Python
 build/
