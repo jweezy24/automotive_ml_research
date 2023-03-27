@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
 import torch.optim as optim
-import sqlite3
+import numpy as np
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 root_path = os.environ["DMD_ROOT"]
