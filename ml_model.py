@@ -54,18 +54,18 @@ def get_accuracy(model, data_loader, criterion):
     return accuracy, loss
 
 if __name__ == "__main__":
-    from dataset_loader import *
+    # from dataset_loader import *
 
     annotations = root_path+"/annotations.txt"
 
-    d_training = DMD(annotations,train=True)
-    d_testing = DMD(annotations,train=False)
+    # d_training = DMD(annotations,train=True)
+    # d_testing = DMD(annotations,train=False)
 
     d_training2 = torchvision.datasets.ImageFolder(root_path,transform=transforms.ToTensor())
 
-    for i in d_training.class_map.keys():
-        print(i)
-        assert(d_training.class_map[i] == d_testing.class_map[i] )
+    # for i in d_training.class_map.keys():
+    #     print(i)
+    #     assert(d_training.class_map[i] == d_testing.class_map[i] )
 
     transform = transforms.Compose([transforms.PILToTensor()])
     
