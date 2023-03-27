@@ -110,11 +110,12 @@ if __name__ == "__main__":
             running_loss = 0.0
 
             f = 0
+            i=0
             print("TRAINING STARTS NOW")
-            for i, data in enumerate(train_loader_fold):
+            for inputs, labels in train_loader_fold:
                 # print(data)
                 # get the inputs; data is a list of [inputs, labels]
-                inputs, labels = data   
+                
                 inputs = inputs.cuda()
                 labels= labels.cuda()
                 
@@ -130,9 +131,10 @@ if __name__ == "__main__":
 
                 # print statistics
                 running_loss += loss.item()
-                if (i*10)%100 == 0:                
+                if (i)%100 == 0:                
                     print(f'[epoch:{epoch + 1}, iter:{i :5d}, frame:{f}] loss: {running_loss/100}')
                     running_loss = 0.0
+                i+=10
                 
 
                 gc.collect()
