@@ -43,7 +43,10 @@ def get_accuracy(model, data_loader, criterion):
     model.eval()
     with torch.no_grad():
         for inputs, targets in data_loader:
+            inputs = inputs.cuda()
+            targets = targets.cuda()
             outputs = model(inputs)
+            outputs = outputs
             _, predicted = torch.max(outputs.data, 1)
             total_samples += targets.size(0)
             total_correct += (predicted == targets).sum().item()
@@ -85,8 +88,9 @@ if __name__ == "__main__":
     train_sampler = SubsetRandomSampler(train_indices)
     test_sampler = SubsetRandomSampler(test_indices)
 
-    train_loader = DataLoader(d_tr_loader, batch_size=batch_size, sampler=train_sampler,num_workers=5)
+    train_loader = DataLoader(d_tr_loader, batch_size=batch_size, sampler=train_sampler, num_workers=5)
     test_loader = DataLoader(d_tr_loader, batch_size=batch_size, sampler=test_sampler,num_workers=5)
+
     
     model = torchvision.models.resnet18().cuda()
 
@@ -96,20 +100,25 @@ if __name__ == "__main__":
     epochs = 5
     k_folds = 5  # choose the number of folds
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
-    for fold, (train_indices, val_indices) in enumerate(kf.split(d_training2.dataset)):
-
-        # Create new data loaders for this fold
-        train_subset = torch.utils.data.Subset(train_loader.dataset, train_indices)
-        train_loader_fold = DataLoader(train_subset, batch_size=train_loader.batch_size, shuffle=True)
+    print(train_loader.dataset.dataset)
+    for fold, (train_indices, val_indices) in enumerate(kf.split(train_loader.dataset.dataset)):
         
-        val_subset = torch.utils.data.Subset(train_loader.dataset, val_indices)
+        # Create new data loaders for this fold
+        train_subset = torch.utils.data.Subset(train_loader.dataset.dataset, train_indices)
+   
+        train_loader_fold = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
+        
+        val_subset = torch.utils.data.Subset(train_loader.dataset.dataset, val_indices)
         val_loader_fold = DataLoader(val_subset, batch_size=train_loader.batch_size)
+
+
 
         for epoch in range(epochs):  # loop over the dataset multiple times
             model.train()
             running_loss = 0.0
 
             f = 0
+            print( train_loader_fold)
             print("TRAINING STARTS NOW")
             for i, data in enumerate(train_loader_fold):
                 # print(data)
