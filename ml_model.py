@@ -96,7 +96,7 @@ if __name__ == "__main__":
     epochs = 5
     k_folds = 5  # choose the number of folds
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
-    for fold, (train_indices, val_indices) in enumerate(kf.split(train_loader.dataset)):
+    for fold, (train_indices, val_indices) in enumerate(kf.split([train_loader.dataset])):
 
         # Create new data loaders for this fold
         train_subset = torch.utils.data.Subset(train_loader.dataset, train_indices)
