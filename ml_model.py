@@ -96,7 +96,7 @@ if __name__ == "__main__":
     epochs = 5
     k_folds = 5  # choose the number of folds
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
-    for fold, (train_indices, val_indices) in enumerate(kf.split(d_training2)):
+    for fold, (train_indices, val_indices) in enumerate(kf.split(d_training2.dataset)):
 
         # Create new data loaders for this fold
         train_subset = torch.utils.data.Subset(train_loader.dataset, train_indices)
@@ -110,12 +110,11 @@ if __name__ == "__main__":
             running_loss = 0.0
 
             f = 0
-            i=0
             print("TRAINING STARTS NOW")
-            for inputs, labels in train_loader_fold:
+            for i, data in enumerate(train_loader_fold):
                 # print(data)
                 # get the inputs; data is a list of [inputs, labels]
-                
+                inputs, labels = data   
                 inputs = inputs.cuda()
                 labels= labels.cuda()
                 
@@ -131,10 +130,9 @@ if __name__ == "__main__":
 
                 # print statistics
                 running_loss += loss.item()
-                if (i)%100 == 0:                
+                if (i*10)%100 == 0:                
                     print(f'[epoch:{epoch + 1}, iter:{i :5d}, frame:{f}] loss: {running_loss/100}')
                     running_loss = 0.0
-                i+=10
                 
 
                 gc.collect()
