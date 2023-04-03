@@ -66,9 +66,6 @@ if __name__ == "__main__":
 
     d_training2 = torchvision.datasets.ImageFolder(root_path,transform=transforms.ToTensor())
 
-    # for i in d_training.class_map.keys():
-    #     print(i)
-    #     assert(d_training.class_map[i] == d_testing.class_map[i] )
 
     transform = transforms.Compose([transforms.PILToTensor()])
     
@@ -118,8 +115,6 @@ if __name__ == "__main__":
             running_loss = 0.0
 
             f = 0
-            print( train_loader_fold)
-            print("TRAINING STARTS NOW")
             for i, data in enumerate(train_loader_fold):
                 # print(data)
                 # get the inputs; data is a list of [inputs, labels]
