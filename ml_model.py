@@ -3,7 +3,7 @@ import torch
 import gc
 import torchvision
 from torch import nn
-from torch.utils.data import DataLoader, SubsetRandomSampler
+from torch.utils.data import DataLoader, SubsetRandomSampler, random_split
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
 import torch.optim as optim
@@ -11,6 +11,9 @@ import numpy as np
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 root_path = os.environ["DMD_ROOT"]
+
+# Set the random seed for reproducibility
+torch.manual_seed(42)
 
 
 class NeuralNetwork(nn.Module):
@@ -77,16 +80,14 @@ if __name__ == "__main__":
 
     # Define the indices to split the dataset
     dataset_size = len(d_tr_loader)
-    indices = list(range(dataset_size))
-    split = int(np.floor(0.8 * dataset_size))  # 80% training data, 20% testing data
-    np.random.shuffle(indices)  # shuffle the indices for randomness
-    train_indices, test_indices = indices[:split], indices[split:]
+    train_size = int(0.8 * dataset_size)
+    test_size = dataset_size - train_size
+    
+    train_dataset, test_dataset = random_split(d_training2, [train_size, test_size])
 
-    train_sampler = SubsetRandomSampler(train_indices)
-    test_sampler = SubsetRandomSampler(test_indices)
 
-    train_loader = DataLoader(d_tr_loader, batch_size=batch_size, sampler=train_sampler, num_workers=5)
-    test_loader = DataLoader(d_tr_loader, batch_size=batch_size, sampler=test_sampler,num_workers=5)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size,  num_workers=5)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=5)
 
     
     model = torchvision.models.resnet18().cuda()
