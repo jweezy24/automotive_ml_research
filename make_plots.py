@@ -77,7 +77,7 @@ def get_accuracy(model, data_loader, criterion,classes):
             for p in range(np_predicted.shape[0]):
                 confusion_matrix[np_predicted[p],np_targets[p]]+=1
             if c%checkpoint == 0 and c>0:
-                plot_confusion_matrix(confusion_matrix,normalize=True)
+                plot_confusion_matrix(confusion_matrix,classes,normalize=True)
             c+=1
             
     accuracy = 100 * total_correct / total_samples
