@@ -54,6 +54,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     #                 color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
     plt.savefig("./cm.pdf")
+    plt.clf()
 
 
 def get_accuracy(model, data_loader, criterion,classes):
