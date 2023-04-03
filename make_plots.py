@@ -27,7 +27,6 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     """
     if normalize:
         cm = preprocessing.normalize(cm,axis=1)
-        # cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
@@ -52,9 +51,11 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     #         ax.text(j, i, format(cm[i, j], fmt),
     #                 ha="center", va="center",
     #                 color="white" if cm[i, j] > thresh else "black")
+    
     fig.tight_layout()
     plt.savefig("./cm.pdf")
     plt.clf()
+    plt.close('all')
 
 
 def get_accuracy(model, data_loader, criterion,classes):
