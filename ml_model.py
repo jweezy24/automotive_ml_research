@@ -79,12 +79,9 @@ if __name__ == "__main__":
     
     batch_size = 10
 
-    d_tr_loader = DataLoader(d_training2,batch_size=batch_size,shuffle=True,num_workers=5)
-    # d_te_loader =DataLoader(d_testing,batch_size=10,shuffle=True,num_workers=5)
-
 
     # Define the indices to split the dataset
-    dataset_size = len(d_tr_loader)
+    dataset_size = len(d_training2)
     train_size = int(0.8 * dataset_size)
     test_size = dataset_size - train_size
     
