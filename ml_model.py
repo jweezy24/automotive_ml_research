@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
                 # print statistics
                 running_loss += loss.item()
-                if (i*10)%100 == 0:                
+                if (i*10)%10000 == 0:                
                     print(f'[epoch:{epoch + 1}, iter:{i :5d}, frame:{f}] loss: {running_loss/100}')
                     running_loss = 0.0
                 
