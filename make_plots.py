@@ -45,13 +45,13 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
              rotation_mode="anchor")
 
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i in range(cm.shape[0]):
-        for j in range(cm.shape[1]):
-            ax.text(j, i, format(cm[i, j], fmt),
-                    ha="center", va="center",
-                    color="white" if cm[i, j] > thresh else "black")
+    # fmt = '.2f' if normalize else 'd'
+    # thresh = cm.max() / 2.
+    # for i in range(cm.shape[0]):
+    #     for j in range(cm.shape[1]):
+    #         ax.text(j, i, format(cm[i, j], fmt),
+    #                 ha="center", va="center",
+    #                 color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
     plt.savefig("./cm.pdf")
 
