@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
 from tqdm import tqdm
+from sklearn import preprocessing
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,7 +26,8 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     :return: None
     """
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm = preprocessing.normalize(cm,axis=1)
+        # cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
@@ -35,7 +37,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Face Identificati
     ax.figure.colorbar(im, ax=ax)
     ax.set(xticks=np.arange(cm.shape[1]),
            yticks=np.arange(cm.shape[0]),
-           xticklabels=classes, yticklabels=classes,
+        #    xticklabels=classes, yticklabels=classes,
            title=title,
            ylabel='True label',
            xlabel='Predicted label')
@@ -61,7 +63,7 @@ def get_accuracy(model, data_loader, criterion,classes):
     model.eval()
     
     confusion_matrix = np.zeros((len(classes),len(classes)))
-    checkpoint = 1000
+    checkpoint = 100
     c = 0
     with torch.no_grad():
         for inputs, targets in tqdm(data_loader.dataset):
