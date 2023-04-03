@@ -6,6 +6,8 @@ from torch import nn
 from torch.utils.data import DataLoader, SubsetRandomSampler, random_split
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
+from tqdm import tqdm
+from datetime import datetime
 import torch.optim as optim
 import numpy as np
 
@@ -62,6 +64,9 @@ def get_accuracy(model, data_loader, criterion):
 if __name__ == "__main__":
     # from dataset_loader import *
 
+    now = datetime.now() # current date and time
+    date = date_time = now.strftime("%m-%d-%Y")
+
     annotations = root_path+"/annotations.txt"
 
     # d_training = DMD(annotations,train=True)
@@ -116,7 +121,7 @@ if __name__ == "__main__":
             running_loss = 0.0
 
             f = 0
-            for i, data in enumerate(train_loader_fold):
+            for i, data in enumerate(tqdm(train_loader_fold)):
                 # print(data)
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data   
@@ -149,7 +154,7 @@ if __name__ == "__main__":
             torch.save(model.state_dict(), "./checkpoint")
 
             accuracy,loss_eval = get_accuracy(model, val_loader_fold, criterion)
-            with open("checkpoints.txt", "a+") as f:
+            with open(f"checkpoints_{date}.txt", "a+") as f:
                 f.write(f" Epoch {epoch}\t Fold: {fold}\t Accuracy: {accuracy}\t Loss: {loss_eval}\n") 
     
     
