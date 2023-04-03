@@ -2,6 +2,7 @@ from torch import nn
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
+from tqdm import tqdm
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,7 +64,7 @@ def get_accuracy(model, data_loader, criterion,classes):
     checkpoint = 1000
     c = 0
     with torch.no_grad():
-        for inputs, targets in data_loader.dataset:
+        for inputs, targets in tqdm(data_loader.dataset):
             inputs = inputs.cuda()
             targets = targets.cuda()
             outputs = model(inputs)
