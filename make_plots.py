@@ -117,6 +117,7 @@ if __name__ == "__main__":
     
     model = torchvision.models.resnet18().cuda()
     
+    checkpoint = torch.load('checkpoint')
     
     model = torchvision.models.resnet18().cuda()
     model.load_state_dict(checkpoint)
