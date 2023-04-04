@@ -70,7 +70,7 @@ def get_accuracy(model, data_loader, criterion,classes):
     checkpoint = 100
     c = 0
     with torch.no_grad():
-        for inputs, targets in tqdm(data_loader.dataset):
+        for inputs, targets in tqdm(data_loader):
             inputs = inputs.cuda()
             targets = targets.cuda()
             outputs = model(inputs)
