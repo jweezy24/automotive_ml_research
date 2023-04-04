@@ -1,5 +1,5 @@
 from torch import nn
-from torch.utils.data import DataLoader, SubsetRandomSampler
+from torch.utils.data import DataLoader, SubsetRandomSampler, random_split
 from sklearn.model_selection import KFold
 from torchvision import datasets, transforms
 from tqdm import tqdm
