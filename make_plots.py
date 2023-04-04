@@ -67,8 +67,8 @@ def get_accuracy(model, data_loader, criterion,classes):
     model.eval()
     
     confusion_matrix = np.zeros((len(classes),len(classes)))
-    checkpoint = 100
-    c = 0
+
+ 
     with torch.no_grad():
         for inputs, targets in tqdm(data_loader):
             inputs = inputs.cuda()
@@ -82,10 +82,9 @@ def get_accuracy(model, data_loader, criterion,classes):
             np_targets = targets.cpu().numpy()
             for p in range(np_predicted.shape[0]):
                 confusion_matrix[np_predicted[p],np_targets[p]]+=1
-            if c%checkpoint == 0 and c>0:
-                plot_confusion_matrix(confusion_matrix,classes,normalize=True)
-            c+=1
             
+            
+    plot_confusion_matrix(confusion_matrix,classes,normalize=True)            
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
     return accuracy, loss, confusion_matrix
