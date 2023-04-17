@@ -34,9 +34,9 @@ class ImageFolderWithPaths(datasets.ImageFolder):
 
 def parse_annotations():
     
-    path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
+    # path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
     
-    # path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
+    path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
 
     final_dictionary = {}
     with open(path,"r") as f:
@@ -135,7 +135,7 @@ def make_plot(dictionary,total_samples,title,data_type):
     plt.clf()
 
 
-def make_plotly(dictionary,total_samples,title,data_type):
+def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassifications based on"):
     x_axis = list(dictionary.keys())
     vals = list(dictionary.values())
     y_axis = 100*(np.array(vals)/total_samples)
@@ -154,7 +154,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
-        fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
+        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title="Percentage of Misses"))    
 
     elif "Event" in title:
         hy = 216/2.0
@@ -165,7 +165,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 y=x_axis,
                 orientation='h'
             )])
-        fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))  
+        fig.update_layout(title=f'{title_prefix} {title}', xaxis=dict(title="Percentage of Misses"))  
         fig.update_layout(yaxis=dict(
                 tickmode='array',
                 tickvals=[(i)*hx for i in range(len(x_axis))],
@@ -186,11 +186,34 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 title=f"{data_type}"
             ))
 
-        fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
+        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title="Percentage of Misses"))    
     
     pio.write_image(fig,f"figures/{title}_misses_testset.png")
     pio.write_image(fig,f"figures/{title}_misses_testset.pdf")
 
+def plot_data_distribution(annotations,classes):
+    m_data_stats = {'age': [], 'gender': [], 'exp': [], 'd_freq': [], "label": []}
+    for key in annotations.keys():
+        tmp_age = m_data_stats["age"]
+        tmp_gender = m_data_stats["gender"]
+        tmp_exp = m_data_stats["exp"]
+        tmp_dfreq = m_data_stats["d_freq"]
+        tmp_label = m_data_stats["label"]
+
+        tmp_age.append(annotations[key]["age"])
+        tmp_gender.append(annotations[key]["gender"])
+        tmp_exp.append(annotations[key]["exp"])
+        tmp_dfreq.append(annotations[key]["d_freq"])
+        tmp_label.append(key)
+        
+
+        m_data_stats["age"] = tmp_age 
+        m_data_stats["gender"] = tmp_gender 
+        m_data_stats["exp"] = tmp_exp 
+        m_data_stats["d_freq"] = tmp_dfreq 
+        m_data_stats["label"] = tmp_label 
+    
+    plot_misses(m_data_stats, len(annotations.keys()), classes)
 
 def plot_misses(incorrect,total_samples,classes):
     age_ranges = {20:0,30:0,40:0,50:0}
@@ -234,11 +257,11 @@ def plot_misses(incorrect,total_samples,classes):
                 else:
                     labels[label] = 1
 
-    make_plotly(age_ranges,total_samples,"Age","Ages")
-    make_plotly(genders,total_samples,"Gender","Genders")
-    make_plotly(experience,total_samples,"Experience","Experience")
-    make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency")
-    make_plotly(labels,total_samples,"Event","Events")
+    make_plotly(age_ranges,total_samples,"Age","Ages", title_prefix="Distribution of ")
+    make_plotly(genders,total_samples,"Gender","Genders", title_prefix="Distribution of ")
+    make_plotly(experience,total_samples,"Experience","Experience", title_prefix="Distribution of ")
+    make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency", title_prefix="Distribution of ")
+    make_plotly(labels,total_samples,"Event","Events", title_prefix="Distribution of ")
 
 
 def get_accuracy(model, data_loader, criterion,classes, annotations):
@@ -267,8 +290,8 @@ def get_accuracy(model, data_loader, criterion,classes, annotations):
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
     
-    plot_misses(incorrect,total_samples-total_correct,classes)
-
+    # plot_misses(incorrect,total_samples-total_correct,classes)
+    plot_data_distribution(annotations, classes)
     return accuracy, loss
 
 def main(annotations):
@@ -306,7 +329,7 @@ def main(annotations):
 
     criterion = nn.CrossEntropyLoss()
 
-    get_accuracy(model,test_loader,criterion,classes, annotations)
+    get_accuracy(model,d_tr_loader,criterion,classes, annotations)
 
 
 
