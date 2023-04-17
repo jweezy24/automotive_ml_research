@@ -157,8 +157,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
 
     elif "Event" in title:
-        hy = 216/2.0
-        hx = 366/len(x_axis) 
+        hx = 1.01
         
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
