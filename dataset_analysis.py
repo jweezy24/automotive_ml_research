@@ -157,6 +157,9 @@ def make_plotly(dictionary,total_samples,title,data_type):
         fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
 
     elif "Event" in title:
+        hy = 216/2.0
+        hx = 366/12.0  
+        
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
                 y=x_axis,
@@ -165,10 +168,9 @@ def make_plotly(dictionary,total_samples,title,data_type):
         fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))  
         fig.update_layout(yaxis=dict(
                 tickmode='array',
-                tickvals=[i for i in range(len(x_axis))],
+                tickvals=[(2*i-1)*hx/2 for i in range(len(x_axis))],
                 ticktext=x_axis,
-                title=f"{data_type}",
-                dtick=1.0
+                title=f"{data_type}"
             ))
         print(f"DTICK = {fig.layout.yaxis.dtick}")
     else:
