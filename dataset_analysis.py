@@ -303,7 +303,7 @@ def main(annotations):
 
     criterion = nn.CrossEntropyLoss()
 
-    get_accuracy(model,test_loader,criterion,classes, annotations)
+    get_accuracy(model,d_tr_loader,criterion,classes, annotations)
 
 
 
