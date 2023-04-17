@@ -157,7 +157,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
 
     elif "Event" in title:
-        hx = 1.01
+        hx = 1.1
         
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
@@ -260,7 +260,7 @@ def plot_misses(incorrect,total_samples,classes,title_prefix="Misclassifications
     make_plotly(genders,total_samples,"Gender","Genders", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
     make_plotly(experience,total_samples,"Experience","Experience", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
     make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
-    make_plotly(labels,total_samples,"Event","Events", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
+    make_plotly(labels,total_samples,"Events","Events", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
 
 
 def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=False,dataset_type="full"):
