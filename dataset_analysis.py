@@ -8,6 +8,8 @@ import matplotlib
 import torch
 import torchvision
 import os
+import plotly.graph_objs as go
+import plotly.io as pio
 
 root_path = os.environ["DMD_ROOT"]
 
@@ -31,7 +33,11 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def parse_annotations():
-    path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
+    
+    #path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
+    
+    path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
+
     final_dictionary = {}
     with open(path,"r") as f:
         for line in f.readlines():
@@ -128,6 +134,45 @@ def make_plot(dictionary,total_samples,title,data_type):
 
     plt.clf()
 
+
+def make_plotly(dictionary,total_samples,title,data_type):
+    x_axis = list(dictionary.keys())
+    vals = list(dictionary.values())
+    y_axis = 100*(np.array(vals)/total_samples)
+
+    # Create your bar chart using the go.Bar() function
+
+    if "Age" in title:
+        x_axis = [f"Under {i}" for i in x_axis]
+        fig = go.Figure(data=[go.Bar(
+                x=x_axis,
+                y=y_axis
+            )])
+        fig.update_layout(xaxis=dict(
+                tickmode='array',
+                tickvals=[i for i in range(len(x_axis))],
+                ticktext=x_axis,
+                title=f"{data_type}"
+            ))
+    else:
+        fig = go.Figure(data=[go.Bar(
+                x=x_axis,
+                y=y_axis
+            )])
+        # Set the xaxis property of the layout to include your custom x-tick labels
+        fig.update_layout(xaxis=dict(
+                tickmode='array',
+                tickvals=[i for i in range(len(x_axis))],
+                ticktext=x_axis,
+                title=f"{data_type}"
+            ))
+
+    fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
+    
+    pio.write_image(fig,f"figures/{title}_misses.png")
+    pio.write_image(fig,f"figures/{title}_misses.pdf")
+
+
 def plot_misses(incorrect,total_samples,classes):
     age_ranges = {20:0,30:0,40:0,50:0}
     genders = {"Male":0,"Female":0,"Non-Binary":0}
@@ -170,11 +215,11 @@ def plot_misses(incorrect,total_samples,classes):
                 else:
                     labels[label] = 1
 
-    make_plot(age_ranges,total_samples,"Age","Ages")
-    make_plot(genders,total_samples,"Gender","Genders")
-    make_plot(experience,total_samples,"Experience","Experience")
-    make_plot(frequency,total_samples,"Driving Frequency","Driving Frequency")
-    make_plot(labels,total_samples,"Event","Events")
+    make_plotly(age_ranges,total_samples,"Age","Ages")
+    make_plotly(genders,total_samples,"Gender","Genders")
+    make_plotly(experience,total_samples,"Experience","Experience")
+    make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency")
+    make_plotly(labels,total_samples,"Event","Events")
 
 
 def get_accuracy(model, data_loader, criterion,classes, annotations):
