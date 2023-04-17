@@ -159,7 +159,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
     elif "Event" in title:
         hx = 1.01
         all_data = zip(x_axis,y_axis)
-        all_data = sorted(all_data,key=lambda x: x[1])
+        all_data = sorted(all_data,key=lambda x: x[0])
         x_axis,y_axis = zip(*all_data)
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
