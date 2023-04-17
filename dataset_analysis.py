@@ -106,6 +106,7 @@ def make_plot(dictionary,total_samples,title,data_type):
     fig, ax = plt.subplots(figsize=(7, 2))
     if "Event" in title or "Freq" in title: 
         ax.barh(range(len(x_axis)), y_axis, tick_label=x_axis)
+        ax.tick_params(axis='y', which='major', pad=10)
     else:
         ax.bar(range(len(x_axis)), y_axis, tick_label=x_axis)
 
