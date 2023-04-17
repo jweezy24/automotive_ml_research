@@ -34,9 +34,9 @@ class ImageFolderWithPaths(datasets.ImageFolder):
 
 def parse_annotations():
     
-    # path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
+    path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
     
-    path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
+    # path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
 
     final_dictionary = {}
     with open(path,"r") as f:
