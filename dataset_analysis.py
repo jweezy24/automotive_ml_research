@@ -163,8 +163,8 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         x_axis,y_axis = zip(*all_data)
 
         fig = go.Figure(data=[go.Bar(
-                x=y_axis,
-                y=x_axis
+                x=x_axis,
+                y=y_axis
                 # orientation='h'
             )])
         fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))  
