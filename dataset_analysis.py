@@ -291,7 +291,6 @@ def main(annotations):
     train_loader = DataLoader(train_dataset, batch_size=batch_size,  num_workers=5)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=5)
 
-    print(dir(test_loader))
     
     model = torchvision.models.resnet18().cuda()
     
