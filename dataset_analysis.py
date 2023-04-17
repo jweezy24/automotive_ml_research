@@ -10,6 +10,7 @@ import torchvision
 import os
 import plotly.graph_objs as go
 import plotly.io as pio
+from plotly.subplots import make_subplots
 
 root_path = os.environ["DMD_ROOT"]
 
@@ -157,10 +158,10 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
 
     elif "Event" in title:
-        hx = 1.1
         all_data = zip(x_axis,y_axis)
         all_data = sorted(all_data,key=lambda x: x[0])
         x_axis,y_axis = zip(*all_data)
+
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
                 y=x_axis,
@@ -169,7 +170,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         fig.update_layout(title=f'{title_prefix} {title}', xaxis=dict(title=f"{y_label}"))  
         fig.update_layout(yaxis=dict(
                 tickmode='array',
-                tickvals=[(i)*hx for i in range(len(x_axis))],
+                tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
