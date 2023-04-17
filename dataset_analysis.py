@@ -168,7 +168,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
                 title=f"{data_type}",
-                dtick= 2.0
+                dtick= 10.0
             ))
           
     else:
