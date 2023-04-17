@@ -265,7 +265,7 @@ def plot_misses(incorrect,total_samples,classes,title_prefix="Misclassifications
     make_plotly(labels,total_samples,"Events","Events", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
 
 
-def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=True,dataset_type="full"):
+def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses_bool=True,dataset_type="full"):
     total_correct = 0
     total_samples = 0
     
@@ -290,7 +290,7 @@ def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=
     # plot_confusion_matrix(confusion_matrix,classes,normalize=True)            
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
-    if plot_misses:
+    if plot_misses_bool:
         plot_misses(incorrect,total_samples,dataset_type=dataset_type)
     
     plot_data_distribution(annotations, classes,dataset_type=dataset_type)
