@@ -30,7 +30,7 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def parse_annotations():
-    path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
+    path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
     final_dictionary = {}
     with open(path,"r") as f:
         for line in f.readlines():
