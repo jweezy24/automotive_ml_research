@@ -174,6 +174,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
+        fig.update_xaxes(tickangle= -90)  
         print(f"DTICK = {fig.layout.yaxis.dtick}")
     else:
         fig = go.Figure(data=[go.Bar(
