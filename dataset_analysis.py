@@ -34,9 +34,9 @@ class ImageFolderWithPaths(datasets.ImageFolder):
 
 def parse_annotations():
     
-    path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
+    # path = "/nobackup.1/jwwest/automotive_ml_research/dataset_dmd/clips/annotations.txt"
     
-    # path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
+    path = "/home/jweezy/Drive3/automotive_ml_research/annotations.txt"
 
     final_dictionary = {}
     with open(path,"r") as f:
@@ -158,7 +158,9 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
 
     elif "Event" in title:
         hx = 2
-        
+        # all_data = zip(x_axis,y_axis)
+        # all_data = sorted(all_data,key=lambda x: x[1])
+
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
                 y=x_axis,
@@ -263,7 +265,7 @@ def plot_misses(incorrect,total_samples,classes,title_prefix="Misclassifications
     make_plotly(labels,total_samples,"Events","Events", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
 
 
-def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=False,dataset_type="full"):
+def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=True,dataset_type="full"):
     total_correct = 0
     total_samples = 0
     
