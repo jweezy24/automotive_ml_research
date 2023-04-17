@@ -106,14 +106,18 @@ def make_plot(dictionary,total_samples,title,data_type):
     fig, ax = plt.subplots(figsize=(7, 2))
     if "Event" in title or "Freq" in title: 
         ax.barh(range(len(x_axis)), y_axis, tick_label=x_axis)
+        ax.set_ylabel(f"{data_type}")
+        ax.set_xlabel(f"Percentage of Failures")
+        ax.set_title(f"Misclassifications based on {title}")
         ax.tick_params(axis='y', which='major', pad=10)
+
     else:
         ax.bar(range(len(x_axis)), y_axis, tick_label=x_axis)
 
-    ax.set_xlabel(f"{data_type}")
-    ax.set_ylabel(f"Percentage of Failures")
-    ax.set_title(f"Misclassifications based on {title}")
-    
+        ax.set_xlabel(f"{data_type}")
+        ax.set_ylabel(f"Percentage of Failures")
+        ax.set_title(f"Misclassifications based on {title}")
+        
 
     plt.savefig(f"figures/{title}_misses.png")
     plt.savefig(f"figures/{title}_misses.pdf")
@@ -195,7 +199,7 @@ def get_accuracy(model, data_loader, criterion,classes, annotations):
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
     
-    plot_misses(incorrect,total_samples,classes)
+    plot_misses(incorrect,total_samples-total_correct,classes)
 
     return accuracy, loss
 
