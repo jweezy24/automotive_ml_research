@@ -9,6 +9,7 @@ train_model_test.py
 *.xml
 
 dataset_dmd/*
+figures/*
 
 # Distribution / packaging
 .Python
