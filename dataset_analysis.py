@@ -162,6 +162,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 y=x_axis,
                 orientation='h'
             )])
+        fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))  
         fig.update_layout(yaxis=dict(
                 tickmode='array',
                 tickvals=[i for i in range(len(x_axis))],
@@ -169,7 +170,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 title=f"{data_type}",
                 dtick= 2.0
             ))
-        fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))    
+          
     else:
         fig = go.Figure(data=[go.Bar(
                 x=x_axis,
