@@ -291,7 +291,7 @@ def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
     if plot_misses:
-        plot_misses(incorrect,total_samples-total_correct,classes)
+        plot_misses(incorrect,total_samples,dataset_type=dataset_type)
     
     plot_data_distribution(annotations, classes,dataset_type=dataset_type)
     
