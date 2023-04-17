@@ -97,7 +97,7 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-    epochs = 5
+    epochs = 50
     k_folds = 5  # choose the number of folds
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
     print(train_loader.dataset.dataset)
