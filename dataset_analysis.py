@@ -155,11 +155,12 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 title=f"{data_type}"
             ))
         fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
-        
+
     elif "Event" in title:
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
-                y=x_axis
+                y=x_axis,
+                orientation='h'
             )])
         fig.update_layout(yaxis=dict(
                 tickmode='array',
