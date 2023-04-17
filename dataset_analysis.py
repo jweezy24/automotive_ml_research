@@ -4,6 +4,7 @@ from torchvision import datasets, transforms
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 import torch
 import torchvision
 import os
@@ -105,11 +106,14 @@ def make_plot(dictionary,total_samples,title,data_type):
 
     fig, ax = plt.subplots(figsize=(7, 2))
     if "Event" in title or "Freq" in title: 
-        ax.barh(range(len(x_axis)), y_axis, tick_label=x_axis)
+        bars = ax.barh(range(len(x_axis)), y_axis, tick_label=x_axis)
         ax.set_ylabel(f"{data_type}")
         ax.set_xlabel(f"Percentage of Failures")
         ax.set_title(f"Misclassifications based on {title}")
-        ax.tick_params(axis='y', which='major', pad=100)
+        bar_height = bars[0].get_height() # get the height of a bar
+        ax.set_ylim(-bar_height, len(y_axis)*bar_height) # adjust the y-axis limits
+        ax.tick_params(axis='y', which='major', pad=10) # add spacing between y-tick labels
+
 
     else:
         ax.bar(range(len(x_axis)), y_axis, tick_label=x_axis)
