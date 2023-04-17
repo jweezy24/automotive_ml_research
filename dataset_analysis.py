@@ -164,11 +164,11 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
 
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
-                y=x_axis,
-                orientation='h'
+                y=x_axis
+                # orientation='h'
             )])
-        fig.update_layout(title=f'{title_prefix} {title}', xaxis=dict(title=f"{y_label}"))  
-        fig.update_layout(yaxis=dict(
+        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))  
+        fig.update_layout(xaxis=dict(
                 tickmode='array',
                 tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
