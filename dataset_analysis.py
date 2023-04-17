@@ -135,7 +135,7 @@ def make_plot(dictionary,total_samples,title,data_type):
     plt.clf()
 
 
-def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassifications based on"):
+def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassifications based on", plot_type="misses", plot_dataset="testset",y_label="Percentage of Misses"):
     x_axis = list(dictionary.keys())
     vals = list(dictionary.values())
     y_axis = 100*(np.array(vals)/total_samples)
@@ -154,7 +154,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
-        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title="Percentage of Misses"))    
+        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
 
     elif "Event" in title:
         hy = 216/2.0
@@ -165,7 +165,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
                 y=x_axis,
                 orientation='h'
             )])
-        fig.update_layout(title=f'{title_prefix} {title}', xaxis=dict(title="Percentage of Misses"))  
+        fig.update_layout(title=f'{title_prefix} {title}', xaxis=dict(title=f"{y_label}"))  
         fig.update_layout(yaxis=dict(
                 tickmode='array',
                 tickvals=[(i)*hx for i in range(len(x_axis))],
@@ -186,12 +186,12 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
                 title=f"{data_type}"
             ))
 
-        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title="Percentage of Misses"))    
+        fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
     
-    pio.write_image(fig,f"figures/{title}_misses_testset.png")
-    pio.write_image(fig,f"figures/{title}_misses_testset.pdf")
+    pio.write_image(fig,f"figures/{title}_{plot_type}_{plot_dataset}.png")
+    pio.write_image(fig,f"figures/{title}_{plot_type}_{plot_dataset}.pdf")
 
-def plot_data_distribution(annotations,classes):
+def plot_data_distribution(annotations,classes,dataset_type="full"):
     m_data_stats = {'age': [], 'gender': [], 'exp': [], 'd_freq': [], "label": []}
     for key in annotations.keys():
         tmp_age = m_data_stats["age"]
@@ -213,9 +213,9 @@ def plot_data_distribution(annotations,classes):
         m_data_stats["d_freq"] = tmp_dfreq 
         m_data_stats["label"] = tmp_label 
     
-    plot_misses(m_data_stats, len(annotations.keys()), classes)
+    plot_misses(m_data_stats, len(annotations.keys()), classes,title_prefix="Distribution of ", plot_type="distribution", plot_dataset=dataset_type,y_label="Percentage of Data")
 
-def plot_misses(incorrect,total_samples,classes):
+def plot_misses(incorrect,total_samples,classes,title_prefix="Misclassifications based on", plot_type="misses", plot_dataset="testset",y_label="Percentage of Misses"):
     age_ranges = {20:0,30:0,40:0,50:0}
     genders = {"Male":0,"Female":0,"Non-Binary":0}
     experience = {}
@@ -257,14 +257,14 @@ def plot_misses(incorrect,total_samples,classes):
                 else:
                     labels[label] = 1
 
-    make_plotly(age_ranges,total_samples,"Age","Ages", title_prefix="Distribution of ")
-    make_plotly(genders,total_samples,"Gender","Genders", title_prefix="Distribution of ")
-    make_plotly(experience,total_samples,"Experience","Experience", title_prefix="Distribution of ")
-    make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency", title_prefix="Distribution of ")
-    make_plotly(labels,total_samples,"Event","Events", title_prefix="Distribution of ")
+    make_plotly(age_ranges,total_samples,"Age","Ages", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
+    make_plotly(genders,total_samples,"Gender","Genders", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
+    make_plotly(experience,total_samples,"Experience","Experience", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
+    make_plotly(frequency,total_samples,"Driving Frequency","Driving Frequency", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
+    make_plotly(labels,total_samples,"Event","Events", title_prefix=title_prefix,plot_type=plot_type,plot_dataset=plot_dataset,y_label=y_label)
 
 
-def get_accuracy(model, data_loader, criterion,classes, annotations):
+def get_accuracy(model, data_loader, criterion,classes, annotations,plot_misses=False,dataset_type="full"):
     total_correct = 0
     total_samples = 0
     
@@ -289,9 +289,11 @@ def get_accuracy(model, data_loader, criterion,classes, annotations):
     # plot_confusion_matrix(confusion_matrix,classes,normalize=True)            
     accuracy = 100 * total_correct / total_samples
     loss = criterion(outputs, targets).item()
+    if plot_misses:
+        plot_misses(incorrect,total_samples-total_correct,classes)
     
-    # plot_misses(incorrect,total_samples-total_correct,classes)
-    plot_data_distribution(annotations, classes)
+    plot_data_distribution(annotations, classes,dataset_type=dataset_type)
+    
     return accuracy, loss
 
 def main(annotations):
@@ -329,7 +331,8 @@ def main(annotations):
 
     criterion = nn.CrossEntropyLoss()
 
-    get_accuracy(model,d_tr_loader,criterion,classes, annotations)
+    get_accuracy(model,d_tr_loader,criterion,classes, annotations,dataset_type="full")
+    get_accuracy(model,test_loader,criterion,classes, annotations, dataset_type="test")
 
 
 
