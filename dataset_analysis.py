@@ -167,10 +167,9 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 tickmode='array',
                 tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
-                title=f"{data_type}",
-                dtick= 10.0
+                title=f"{data_type}"
             ))
-          
+        print(f"DTICK = {fig.layout.yaxis.dtick}")
     else:
         fig = go.Figure(data=[go.Bar(
                 x=x_axis,
