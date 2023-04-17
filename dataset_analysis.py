@@ -157,7 +157,7 @@ def make_plotly(dictionary,total_samples,title,data_type,title_prefix="Misclassi
         fig.update_layout(title=f'{title_prefix} {title}', yaxis=dict(title=f"{y_label}"))    
 
     elif "Event" in title:
-        hx = 2
+        hx = 1.01
         all_data = zip(x_axis,y_axis)
         all_data = sorted(all_data,key=lambda x: x[1])
         x_axis,y_axis = zip*(all_data)
