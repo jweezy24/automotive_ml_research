@@ -167,7 +167,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
                 title=f"{data_type}",
-                dtick= 1.0
+                dtick= 2.0
             ))
         fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))    
     else:
