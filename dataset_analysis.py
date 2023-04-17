@@ -154,6 +154,8 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
+        fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
+        
     elif "Event" in title:
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
@@ -165,6 +167,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 ticktext=x_axis,
                 title=f"{data_type}"
             ))
+        fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))    
     else:
         fig = go.Figure(data=[go.Bar(
                 x=x_axis,
@@ -178,7 +181,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 title=f"{data_type}"
             ))
 
-    fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
+        fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
     
     pio.write_image(fig,f"figures/{title}_misses.png")
     pio.write_image(fig,f"figures/{title}_misses.pdf")
