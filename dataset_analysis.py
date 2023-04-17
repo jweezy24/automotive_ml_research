@@ -166,7 +166,8 @@ def make_plotly(dictionary,total_samples,title,data_type):
                 tickmode='array',
                 tickvals=[i for i in range(len(x_axis))],
                 ticktext=x_axis,
-                title=f"{data_type}"
+                title=f"{data_type}",
+                dtick= 1.0
             ))
         fig.update_layout(title=f'Misclassifications based on {title}', xaxis=dict(title="Percentage of Misses"))    
     else:
@@ -184,8 +185,8 @@ def make_plotly(dictionary,total_samples,title,data_type):
 
         fig.update_layout(title=f'Misclassifications based on {title}', yaxis=dict(title="Percentage of Misses"))    
     
-    pio.write_image(fig,f"figures/{title}_misses.png")
-    pio.write_image(fig,f"figures/{title}_misses.pdf")
+    pio.write_image(fig,f"figures/{title}_misses_testset.png")
+    pio.write_image(fig,f"figures/{title}_misses_testset.pdf")
 
 
 def plot_misses(incorrect,total_samples,classes):
@@ -302,7 +303,7 @@ def main(annotations):
 
     criterion = nn.CrossEntropyLoss()
 
-    get_accuracy(model,d_tr_loader,criterion,classes, annotations)
+    get_accuracy(model,test_loader,criterion,classes, annotations)
 
 
 
