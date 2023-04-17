@@ -158,7 +158,7 @@ def make_plotly(dictionary,total_samples,title,data_type):
 
     elif "Event" in title:
         hy = 216/2.0
-        hx = 366/12.0  
+        hx = 366/len(x_axis) 
         
         fig = go.Figure(data=[go.Bar(
                 x=y_axis,
